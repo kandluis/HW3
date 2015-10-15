@@ -1,7 +1,7 @@
 from copy import deepcopy
 import timeit
 import sys, os
-import random 
+import random
 import argparse
 
 BOX = 1
@@ -22,8 +22,8 @@ def crossOff(values, nums):
     return violations
 
 class Sudoku:
-    def __init__(self, board, 
-                 lastMoves=[], 
+    def __init__(self, board,
+                 lastMoves=[],
                  isFirstLocal=False):
         self.board = board
 
@@ -32,7 +32,7 @@ class Sudoku:
 
         # The values still remaining for a factor.
         self.factorRemaining = {}
-        
+
         # The number of conflicts at a factor.
         self.factorNumConflicts = {}
 
@@ -67,7 +67,7 @@ class Sudoku:
 
     def setVariable(self, row, col, val):
         """
-        Creates a new version of the board with a variable  
+        Creates a new version of the board with a variable
         set to `val`.
         """
         newBoard = deepcopy(self.board)
@@ -81,39 +81,55 @@ class Sudoku:
         Returns the first variable with assignment epsilon
         i.e. first square in the board that is unassigned.
         """
-        raise NotImplementedError()
+        for i in range(len(self.board)):
+            for j in range(len(self.board[0])):
+                if self.board[i][j] == 0:
+                    return (i,j)
+
+        # Return None.
 
     def complete(self):
         """
         IMPLEMENT FOR PART 1
-        Returns true if the assignment is complete. 
+        Returns true if the assignment is complete.
         """
-        raise NotImplementedError()
+        return self.firstEpsilonVariable() is None
 
     def variableDomain(self, r, c):
         """
         IMPLEMENT FOR PART 1
         Returns current domain for the (row, col) variable .
         """
-        raise NotImplementedError()
+        box_id = self.box_id(r, c)
+
+        # Find variables already used.
+        row = set(self.row(r))
+        col = set(self.col(c))
+        box = set(self.box(box_id))
+
+        # Complement with possible variables.
+        used = row.union(col).union(box)
+        fullset = set(range(10))
+
+        return list(fullset.difference(used))
 
     # PART 2
     def updateFactor(self, factor_type, i):
         """
         IMPLEMENT FOR PART 2
         Update the values remaining for a factor.
-        `factor_type` is one of BOX, ROW, COL 
+        `factor_type` is one of BOX, ROW, COL
         `i` is an index between 0 and 8.
         """
         raise NotImplementedError()
         # values = []
         # if factor_type == BOX:
-            
+
         # if factor_type == ROW:
-            
+
         # if factor_type == COL:
-            
-        
+
+
     def updateAllFactors(self):
         """
         IMPLEMENT FOR PART 2
@@ -143,18 +159,18 @@ class Sudoku:
     def getSuccessors(self):
         """
         IMPLEMENT IN PART 3
-        Returns new assignments with each possible value 
+        Returns new assignments with each possible value
         assigned to the variable returned by `nextVariable`.
         """
         raise NotImplementedError()
 
     def getAllSuccessors(self):
-        if not args.forward: 
+        if not args.forward:
             return self.getSuccessors()
         else:
             return self.getSuccessorsWithForwardChecking()
 
-    # PART 4    
+    # PART 4
     def getSuccessorsWithForwardChecking(self):
         return [s for s in self.getSuccessors() if s.forwardCheck()]
 
@@ -177,7 +193,7 @@ class Sudoku:
     # Fixed variables cannot be changed by the player.
     def _initLocalSearch(self):
         """
-        Variables for keeping track of inconsistent, complete 
+        Variables for keeping track of inconsistent, complete
         assignments. (Complete assignment formulism)
         """
 
@@ -185,18 +201,18 @@ class Sudoku:
         self.fixedVariables = {}
         for r in xrange(0, 9):
             for c in xrange(0, 9):
-                if self.board[r][c]: 
+                if self.board[r][c]:
                     self.fixedVariables[r, c] = True
         self.updateAllFactors()
 
     def modifySwap(self, square1, square2):
         """
-        Modifies the sudoku board to swap two 
+        Modifies the sudoku board to swap two
         row variable assignments.
         """
         t = self.board[square1[0]][square1[1]]
         self.board[square1[0]][square1[1]] = \
-            self.board[square2[0]][square2[1]] 
+            self.board[square2[0]][square2[1]]
         self.board[square2[0]][square2[1]] = t
 
         self.lastMoves = [square1, square2]
@@ -206,18 +222,18 @@ class Sudoku:
     def numConflicts(self):
         "Returns the total number of conflicts"
         return sum(self.factorNumConflicts.values())
-        
+
     # PART 6
     def randomRestart(self):
         """
         IMPLEMENT FOR PART 6
         Randomly initialize a complete, inconsistent board
-        with all the row factors being held consistent. 
+        with all the row factors being held consistent.
         Should call `updateAllFactors` at end.
         """
         raise NotImplementedError()
         # self.updateAllFactors()
-    
+
     # PART 7
     def randomSwap(self):
         """
@@ -226,7 +242,7 @@ class Sudoku:
         causing a row factor conflict.
         """
         raise NotImplementedError()
-      
+
 
     # PART 8
     def gradientDescent(self, variable1, variable2):
@@ -236,9 +252,9 @@ class Sudoku:
         """
         raise NotImplementedError()
 
-        
+
     ### IGNORE - PRINTING CODE
-        
+
     def prettyprinthtml(self):
         """
         Pretty print the sudoku board and the factors.
@@ -246,7 +262,7 @@ class Sudoku:
         out = "\n"
         cols = {}
         self.updateAllFactors()
-            
+
         out = """<style>
          .sudoku .board {
             width: 20pt;
@@ -281,15 +297,15 @@ class Sudoku:
                     td_style = "border-right: #666699 solid 2px;"
 
                 out +=  "<td class='outtop' style='%s'> %s </td>"%(td_style , cols[i] if cols[i] else "   ")
-            out += "<td class='outtop'></td>" * 9 +  "</tr>" 
+            out += "<td class='outtop'></td>" * 9 +  "</tr>"
 
-        
+
         for i in range(9):
             style = "border: #AAAAAA 1px"
-            if i in [0, 3, 6]: 
+            if i in [0, 3, 6]:
                  style = "border:none; border-collapse:collapse; background-color:#AAAAAA 1px; border-top: #666699 solid 2px"
 
-                
+
             out += "<tr style='%s'>"%style
             for j in range(9):
                 assign = self.board[i][j]
@@ -299,15 +315,15 @@ class Sudoku:
                 if j in [8]:
                     td_style = "border-right: #666699 solid 2px;"
 
-                if (i, j) in self.lastMoves: 
+                if (i, j) in self.lastMoves:
                     td_style += "background-color: #FF0000"
                 out += "<td class='board' style='%s'>%s</td>"%(td_style, assign if assign else " ")
 
             row = self.factorRemaining[ROW, i]
-            
-            for j in row: 
+
+            for j in row:
                 out += "<td class='out'>%s</td>"%(str(j) if j else " ")
-                
+
             out += "</tr>"
 
         out += "</table></center>"
@@ -323,28 +339,28 @@ class Sudoku:
 
         </style>"""
         out += "<center><table class='sudoku' style='border:none; border-collapse:collapse; background-color:#FFFFFF; border: #666699 solid 2px;'>"
-        
+
         for i in range(9):
             style = "border: #AAAAAA 1px"
-            if i in [3, 6]: 
+            if i in [3, 6]:
                  style = "border:none; border-collapse:collapse; background-color:#AAAAAA 1px; border-top: #666699 solid 2px"
 
-                
+
             out += "<tr style='%s'>"%style
             for j in range(9):
                 assign = self.board[i][j]
                 td_style = ""
                 if j in [3, 6]:
                     td_style = "border-left: #666699 solid 2px;"
-                if (i, j) in self.lastMoves: 
+                if (i, j) in self.lastMoves:
                     td_style += "background-color: #FF0000"
                 out += "<td style='%s'>%s</td>"%(td_style ,  assign if assign else " ")
-                
+
             out += "</tr>"
         out += "</table></center>"
         return out
 
-    
+
     def __str__(self):
         """
         Pretty print the sudoku board and the factors.
@@ -356,35 +372,35 @@ class Sudoku:
         out = "\n"
         cols = {}
         self.updateAllFactors()
-            
+
         out += OKGREEN
         for i in range(10):
             for j in range(9):
                 cols = self.factorRemaining[COL, j]
                 conf = self.factorNumConflicts[COL, j]
-                if j in [3, 6]: 
-                    out += "| " 
-                if i < 9:     
-                    out +=  (" %d "%(cols[i]) if cols[i] else "   ") + " " 
+                if j in [3, 6]:
+                    out += "| "
+                if i < 9:
+                    out +=  (" %d "%(cols[i]) if cols[i] else "   ") + " "
                 else:
-                    out +=  ("(%d)"%(conf)) +  " " 
-            out += "\n" 
+                    out +=  ("(%d)"%(conf)) +  " "
+            out += "\n"
 
 
         out += ENDC
         out += "........................................\n\n"
         for i in range(9):
-            if i in [3, 6]: 
-                out += "----------------------------------------\n\n" 
+            if i in [3, 6]:
+                out += "----------------------------------------\n\n"
             row = self.factorRemaining[ROW, i]
             conf = self.factorNumConflicts[ROW, i]
             vals = " " .join((str(j) if j else " " for j in row ))
-            
+
             out += "%s %s %s | %s %s %s | %s %s %s : %s (%d) \n\n"%(
                 tuple([((BOLD + " %d " + ENDC)%(assign) if (i, j) in self.lastMoves
                         else " %d "%(assign) if assign
-                        else "X-%d"%(len(self.variableDomain(i, j)))) 
-                       for j, assign in enumerate(self.board[i]) ]) 
+                        else "X-%d"%(len(self.variableDomain(i, j))))
+                       for j, assign in enumerate(self.board[i]) ])
                 + (vals,conf))
 
         return out
@@ -401,7 +417,7 @@ def solveCSP(problem):
             print 'Number of explored: ' + str(statesExplored)
             return state
         else:
-            successors = state.getAllSuccessors()    
+            successors = state.getAllSuccessors()
             if args.debug:
                 if not successors:
                     print "DEADEND BACKTRACKING \n"
@@ -410,7 +426,7 @@ def solveCSP(problem):
         if args.debug:
             os.system("clear")
             print state
-            raw_input("Press Enter to continue...")            
+            raw_input("Press Enter to continue...")
 
         if args.debug_ipython:
             from time import sleep
@@ -423,12 +439,12 @@ def solveCSP(problem):
 
 def solveLocal(problem):
     for r in range(1):
-        problem.randomRestart()  
+        problem.randomRestart()
         state = problem
         for i in range(100000):
             originalConflicts = state.numConflicts()
 
-            v1, v2 = state.randomSwap()        
+            v1, v2 = state.randomSwap()
 
             state.gradientDescent(v1, v2)
 
@@ -440,8 +456,8 @@ def solveLocal(problem):
                 display.clear_output(True)
                 sleep(0.5)
 
-                
-                
+
+
             if state.numConflicts() == 0:
                 return state
                 break
@@ -449,9 +465,9 @@ def solveLocal(problem):
             if args.debug:
                 os.system("clear")
                 print state
-                raw_input("Press Enter to continue...")            
-    
-                
+                raw_input("Press Enter to continue...")
+
+
 
 boardHard = [[0,0,0,0,0,8,9,0,2],
              [6,0,4,3,0,0,0,0,0],
@@ -485,11 +501,11 @@ def set_args(arguments):
     parser.add_argument('--debug', default=False, help="Print each state.")
     parser.add_argument('--debug_ipython', default=False, help="Print each state in html.")
 
-    parser.add_argument('--localsearch', default=False, 
+    parser.add_argument('--localsearch', default=False,
                         help="Use local search.")
-    parser.add_argument('--mostconstrained', default=False, 
+    parser.add_argument('--mostconstrained', default=False,
                         help="Use most constrained heuristic.")
-    parser.add_argument('--forward', default=False, 
+    parser.add_argument('--forward', default=False,
                         help="Use forward checking.")
     parser.add_argument('--time', default=False)
 
@@ -500,7 +516,7 @@ def set_args(arguments):
 def main(arguments):
     global start, args
     set_args(arguments)
-    start = Sudoku(boardEasy if args.easy else boardHard, 
+    start = Sudoku(boardEasy if args.easy else boardHard,
                    isFirstLocal=args.localsearch)
 
     print args
@@ -516,7 +532,7 @@ print 'Solution: ' + str(solveLocal(start))
 '''
 
     print 'Time elapsed: ' + str(timeit.timeit(
-            solveSudokuLocal if args.localsearch else solveSudoku, 
+            solveSudokuLocal if args.localsearch else solveSudoku,
             setup = setup, number = 1))
 
 def doc(fn):
@@ -524,7 +540,7 @@ def doc(fn):
     import IPython.display
     return IPython.display.HTML(pydoc.html.docroutine(fn))
     # print pydoc.render_doc(fn, "Help on %s")
-    
+
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))
 
