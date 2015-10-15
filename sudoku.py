@@ -109,7 +109,7 @@ class Sudoku:
 
         # Complement with possible variables.
         used = row.union(col).union(box)
-        fullset = set(range(10))
+        fullset = set(range(1,10))
 
         return list(fullset.difference(used))
 
@@ -121,13 +121,17 @@ class Sudoku:
         `factor_type` is one of BOX, ROW, COL
         `i` is an index between 0 and 8.
         """
-        raise NotImplementedError()
-        values = []
-        # if factor_type == BOX:
+        values = [x for x in range(9)]
 
-        # if factor_type == ROW:
+        if factor_type == BOX:
+        	state = self.box(i)
+        if factor_type == ROW:
+        	state = self.row(i)
+        if factor_type == COL:
+        	state = self.col(i)
 
-        # if factor_type == COL:
+        self.factorNumConflicts[factor_type, i] = crossOff(values, state)
+        self.factorRemaining[factor_type, i] = values
 
 
     def updateAllFactors(self):
@@ -145,7 +149,13 @@ class Sudoku:
         IMPLEMENT FOR PART 2
         Update all the factors impacting a variable (neighbors in factor graph).
         """
-        raise NotImplementedError()
+        # Update row and column factors.
+        for typ, index in zip([ROW, COL], variable):
+            updateFactor(typ, index)
+
+        # Update the box factors.
+        (row, col) = variable
+        updateFactor(BOX, self.box_id(row, col))
 
     # CSP SEARCH CODE
     def nextVariable(self):
