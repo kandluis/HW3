@@ -122,7 +122,7 @@ class Sudoku:
         `i` is an index between 0 and 8.
         """
         raise NotImplementedError()
-        # values = []
+        values = []
         # if factor_type == BOX:
 
         # if factor_type == ROW:
@@ -136,7 +136,9 @@ class Sudoku:
         Update the values remaining for all factors.
         There is one factor for each row, column, and box.
         """
-        raise NotImplementedError()
+        for t in [ROW, COL, BOX]:
+            for i in range(9):
+                self.updateFactor(t, i)
 
     def updateVariableFactors(self, variable):
         """
