@@ -261,7 +261,7 @@ class Sudoku:
         def getEmptyShuffle(row):
             # Given row, returns a random sequence of values we still need to fill.
             fullset = set(range(1,10))
-            fixedValues = [self.board[row][col] for col in range(len(self.board[row])) if (row, col) not in self.fixedVariables]
+            fixedValues = [self.board[row][col] for col in range(len(self.board[row])) if (row, col) in self.fixedVariables]
             res = list(fullset.difference(set(fixedValues)))
             random.shuffle(res)
             return res
