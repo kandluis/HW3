@@ -281,7 +281,10 @@ class Sudoku:
         Returns two random variables that can be swapped without
         causing a row factor conflict.
         """
-        raise NotImplementedError()
+        r = random.randint(0,8)
+        candidates = [c for c in range(9) if not self.fixedVariables[r, c]]
+        c1, c2 random.sample(candidates, 2)
+        return ((r, c1), (r, c2))
 
 
     # PART 8
