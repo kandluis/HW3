@@ -295,10 +295,11 @@ class Sudoku:
         IMPLEMENT FOR PART 8
         Decide if we should swap the values of variable1 and variable2.
         """
+
         score1 = self.numConflicts()
         self.modifySwap(variable1, variable2)
         score2 = self.numConflicts()
-        if score1 > score2:
+        if score1 < score2 and random.random() <= 0.999:
             self.modifySwap(variable1, variable2)
 
 
