@@ -284,7 +284,7 @@ class Sudoku:
         causing a row factor conflict.
         """
         r = random.randint(0,8)
-        candidates = [c for c in range(9) if (r,c ) not in self.fixedVariables]
+        candidates = [c for c in range(9) if (r, c) not in self.fixedVariables]
         c1, c2 = random.sample(candidates, 2)
         return ((r, c1), (r, c2))
 
