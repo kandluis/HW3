@@ -250,8 +250,10 @@ class Sudoku:
         with all the row factors being held consistent.
         Should call `updateAllFactors` at end.
         """
-        raise NotImplementedError()
-        # self.updateAllFactors()
+        for r in range(len(self.board)):
+            self.board[r] = random.shuffle(range(1,10))
+
+        self.updateAllFactors()
 
     # PART 7
     def randomSwap(self):
