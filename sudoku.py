@@ -121,7 +121,7 @@ class Sudoku:
         `factor_type` is one of BOX, ROW, COL
         `i` is an index between 0 and 8.
         """
-        values = [x for x in range(9)]
+        values = range(1,10)
 
         if factor_type == BOX:
         	state = self.box(i)
@@ -284,7 +284,7 @@ class Sudoku:
         causing a row factor conflict.
         """
         r = random.randint(0,8)
-        candidates = [c for c in range(9) if (r,c ) not in self.fixedVariables]
+        candidates = [c for c in range(9) if (r,c) not in self.fixedVariables]
         c1, c2 = random.sample(candidates, 2)
         return ((r, c1), (r, c2))
 
@@ -299,8 +299,8 @@ class Sudoku:
         score1 = self.numConflicts()
         self.modifySwap(variable1, variable2)
         score2 = self.numConflicts()
-        if score1 < score2 and random.random() <= 0.999:
-            self.modifySwap(variable1, variable2)
+        if score1 < score2 and random.random() < 0.999:
+            self.modifySwap(variable2, variable1)
 
 
     ### IGNORE - PRINTING CODE
