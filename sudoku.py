@@ -283,7 +283,7 @@ class Sudoku:
         """
         r = random.randint(0,8)
         candidates = [c for c in range(9) if not self.fixedVariables[r, c]]
-        c1, c2 random.sample(candidates, 2)
+        c1, c2 = random.sample(candidates, 2)
         return ((r, c1), (r, c2))
 
 
