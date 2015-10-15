@@ -258,8 +258,18 @@ class Sudoku:
         with all the row factors being held consistent.
         Should call `updateAllFactors` at end.
         """
+        def getEmptyShuffle(row):
+            # Given row, returns a random sequence of values we still need to fill.
+            fullset = set(range(1,10))
+            return random.shuffle(list(fullset.difference(set(row))))
+
         for r in range(len(self.board)):
-            self.board[r] = random.shuffle(range(1,10))
+            shuffled = getEmptyShuffle(self.board[r])
+            empty = 0
+            for c, el in enumerate(self.board[r]):
+                if el == 0:
+                    self.board[r][c] = shuffled[empty]
+                    empty += 1
 
         self.updateAllFactors()
 
