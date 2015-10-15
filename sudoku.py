@@ -121,7 +121,7 @@ class Sudoku:
         `factor_type` is one of BOX, ROW, COL
         `i` is an index between 0 and 8.
         """
-        values = [x for x in range(9)]
+        values = range(1,10)
 
         if factor_type == BOX:
         	state = self.box(i)
@@ -295,11 +295,12 @@ class Sudoku:
         IMPLEMENT FOR PART 8
         Decide if we should swap the values of variable1 and variable2.
         """
+
         score1 = self.numConflicts()
         self.modifySwap(variable1, variable2)
         score2 = self.numConflicts()
-        if score1 > score2:
-            self.modifySwap(variable1, variable2)
+        if score1 < score2 and random.random() < 0.999:
+            self.modifySwap(variable2, variable1)
 
 
     ### IGNORE - PRINTING CODE
