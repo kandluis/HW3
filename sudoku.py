@@ -261,15 +261,16 @@ class Sudoku:
         def getEmptyShuffle(row):
             # Given row, returns a random sequence of values we still need to fill.
             fullset = set(range(1,10))
-            return random.shuffle(list(fullset.difference(set(row))))
+            fixedValues = [self.board[row][col] for col in range(len(self.board[row])) if self.fixedVariables[row, col]]
+            return random.shuffle(list(fullset.difference(set(fixedValues))))
 
         for r in range(len(self.board)):
-            shuffled = getEmptyShuffle(self.board[r])
-            empty = 0
-            for c, el in enumerate(self.board[r]):
-                if el == 0:
-                    self.board[r][c] = shuffled[empty]
-                    empty += 1
+            shuffled = getEmptyShuffle(r)
+            shuffledIndex = 0
+            for c in range(len(self.board[r])):
+                if not self.fixedVariables[r, c]:
+                    self.board[r][c] = shuffled[shuffledIndex]
+                    shuffledIndex += 1
 
         self.updateAllFactors()
 
