@@ -151,11 +151,11 @@ class Sudoku:
         """
         # Update row and column factors.
         for typ, index in zip([ROW, COL], variable):
-            updateFactor(typ, index)
+            self.updateFactor(typ, index)
 
         # Update the box factors.
         (row, col) = variable
-        updateFactor(BOX, self.box_id(row, col))
+        self.updateFactor(BOX, self.box_id(row, col))
 
     # CSP SEARCH CODE
     def nextVariable(self):
@@ -261,14 +261,16 @@ class Sudoku:
         def getEmptyShuffle(row):
             # Given row, returns a random sequence of values we still need to fill.
             fullset = set(range(1,10))
-            fixedValues = [self.board[row][col] for col in range(len(self.board[row])) if self.fixedVariables[row, col]]
-            return random.shuffle(list(fullset.difference(set(fixedValues))))
+            fixedValues = [self.board[row][col] for col in range(len(self.board[row])) if (row, col) not in self.fixedVariables]
+            res = list(fullset.difference(set(fixedValues)))
+            random.shuffle(res)
+            return res
 
         for r in range(len(self.board)):
             shuffled = getEmptyShuffle(r)
             shuffledIndex = 0
             for c in range(len(self.board[r])):
-                if not self.fixedVariables[r, c]:
+                if (r, c) not in self.fixedVariables:
                     self.board[r][c] = shuffled[shuffledIndex]
                     shuffledIndex += 1
 
@@ -282,7 +284,7 @@ class Sudoku:
         causing a row factor conflict.
         """
         r = random.randint(0,8)
-        candidates = [c for c in range(9) if not self.fixedVariables[r, c]]
+        candidates = [c for c in range(9) if (r,c ) not in self.fixedVariables]
         c1, c2 = random.sample(candidates, 2)
         return ((r, c1), (r, c2))
 
