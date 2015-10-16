@@ -81,10 +81,10 @@ class Sudoku:
         Returns the first variable with assignment epsilon
         i.e. first square in the board that is unassigned.
         """
-        for i in range(len(self.board)):
-            for j in range(len(self.board[0])):
-                if self.board[i][j] == 0:
-                    return (i,j)
+        for r in range(len(self.board)):
+            for c in range(len(self.board[0])):
+                if self.board[r][c] == 0:
+                    return (r, c)
 
         # Return None.
 
@@ -109,7 +109,7 @@ class Sudoku:
 
         # Complement with possible variables.
         used = row.union(col).union(box)
-        fullset = set(range(1,10))
+        fullset = set(range(1, 10))
 
         return list(fullset.difference(used))
 
@@ -121,15 +121,14 @@ class Sudoku:
         `factor_type` is one of BOX, ROW, COL
         `i` is an index between 0 and 8.
         """
-        values = range(1,10)
-
         if factor_type == BOX:
-        	state = self.box(i)
+            state = self.box(i)
         if factor_type == ROW:
-        	state = self.row(i)
+            state = self.row(i)
         if factor_type == COL:
-        	state = self.col(i)
+            state = self.col(i)
 
+        values = range(1, 10)
         self.factorNumConflicts[factor_type, i] = crossOff(values, state)
         self.factorRemaining[factor_type, i] = values
 
@@ -154,8 +153,7 @@ class Sudoku:
             self.updateFactor(typ, index)
 
         # Update the box factors.
-        (row, col) = variable
-        self.updateFactor(BOX, self.box_id(row, col))
+        self.updateFactor(BOX, self.box_id(*variable))
 
     # CSP SEARCH CODE
     def nextVariable(self):
@@ -206,13 +204,13 @@ class Sudoku:
         IMPLEMENT IN PART 5
         Returns the most constrained unassigned variable.
         """
-        maxConstrain = float('Inf')
+        maxConstraint = float('Inf')
         top_candidate = (None, None)
         for r in range(len(self.board)):
             for c in range(len(self.board[0])):
                 if self.board[r][c] == 0:
-                	if len(self.variableDomain(r, c)) < maxConstrain:
-                		top_candidate = (r, c)
+                    if len(self.variableDomain(r, c)) < maxConstraint:
+                        top_candidate = (r, c)
         return top_candidate
 
 
@@ -260,7 +258,7 @@ class Sudoku:
         """
         def getEmptyShuffle(row):
             # Given row, returns a random sequence of values we still need to fill.
-            fullset = set(range(1,10))
+            fullset = set(range(1, 10))
             fixedValues = [self.board[row][col] for col in range(len(self.board[row])) if (row, col) in self.fixedVariables]
             res = list(fullset.difference(set(fixedValues)))
             random.shuffle(res)
@@ -283,7 +281,7 @@ class Sudoku:
         Returns two random variables that can be swapped without
         causing a row factor conflict.
         """
-        r = random.randint(0,8)
+        r = random.randint(0, 8)
         candidates = [c for c in range(9) if (r, c) not in self.fixedVariables]
         c1, c2 = random.sample(candidates, 2)
         return ((r, c1), (r, c2))
@@ -299,6 +297,8 @@ class Sudoku:
         score1 = self.numConflicts()
         self.modifySwap(variable1, variable2)
         score2 = self.numConflicts()
+
+        # Swap back if old score was better with 99.9% probability.
         if score1 < score2 and random.random() < 0.999:
             self.modifySwap(variable2, variable1)
 
