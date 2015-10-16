@@ -81,7 +81,7 @@ Lastly, we can take a look at Figure \ref{fig:local} and Figure \ref{fig:stochas
 \end{figure}
 
 \end{answer}
-
+The design for a genetic algorithm that solves sudoku puzzles would be similar to our stochastic localized search. Initially, we'd generate a sequence of digits representing random entries (from $1$ to $9$) into empty slots (if we want to be clever, we do the same things as we did in local search and make sure we satisfy at least the row requirements) and have this represent a chromosome. We would measure fitness based on the inverse of the number of constraints violated for the given board (so that more violations give a lower fitness), with the likelihood of selection for mating equivalent to the normalized version over the population of this ``fitness'' score. For the cross over, we'd randomly select a location on the string to merge from each parent, with mutation consisting of the swapping of random elements on the same row. The algorithm would be similar to local search.
 \begin{answer}[Problem 9]
 
 \end{answer}
