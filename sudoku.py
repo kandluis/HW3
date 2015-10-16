@@ -3,6 +3,7 @@ import timeit
 import sys, os
 import random
 import argparse
+import matplotlib.pyplot as plt
 
 BOX = 1
 ROW = 2
@@ -298,7 +299,7 @@ class Sudoku:
         self.modifySwap(variable1, variable2)
         score2 = self.numConflicts()
 
-        # Swap back if old score was better with 99.9% probability.
+        # Swap back if old score was strictly better, with 99.9% probability.
         if score1 < score2 and random.random() < 0.999:
             self.modifySwap(variable2, variable1)
 
@@ -488,15 +489,35 @@ def solveCSP(problem):
     return None
 
 def solveLocal(problem):
-    for r in range(1):
+    # Create plot of evaluation function.
+    if args.showplots:
+        xs = range(101)
+        plt.figure(1)
+        plt.title("Local Search Conflicts.")
+        plt.xlabel("Iteration in Thousands")
+        plt.ylabel("Number of Conflicts.")
+        plt.ylim(0, 10)
+
+    for r in range(int(args.localsearch)):
         problem.randomRestart()
         state = problem
+        if args.showplots:
+            ys = []
         for i in range(100000):
             originalConflicts = state.numConflicts()
 
             v1, v2 = state.randomSwap()
 
             state.gradientDescent(v1, v2)
+
+            if args.showplots and i % 1000 == 0:
+                ys.append(state.numConflicts())
+
+            # exit early if success
+            if state.numConflicts() == 0:
+                if args.showplots:
+                    ys.append(state.numConflicts())
+                break
 
             if args.debug_ipython:
                 from time import sleep
@@ -506,16 +527,23 @@ def solveLocal(problem):
                 display.clear_output(True)
                 sleep(0.5)
 
-
-
-            if state.numConflicts() == 0:
-                return state
-                break
-
             if args.debug:
                 os.system("clear")
                 print state
                 raw_input("Press Enter to continue...")
+
+        # Add line to plot.
+        if args.showplots:
+            plt.plot(xs[:len(ys)], ys)
+
+    if args.showplots:
+        plt.show()
+
+    # Return final state if successful so we can print it.
+    if state.numConflicts() == 0:
+        return state
+    # If unsuccessful, print out number of conflicts.
+    return "Conflicts remaining: {}".format(state.numConflicts())
 
 
 
@@ -551,14 +579,14 @@ def set_args(arguments):
     parser.add_argument('--debug', default=False, help="Print each state.")
     parser.add_argument('--debug_ipython', default=False, help="Print each state in html.")
 
-    parser.add_argument('--localsearch', default=False,
-                        help="Use local search.")
+    parser.add_argument('--localsearch', default=0,
+                        help="Number of times to run local search. Set to a non-zero value.")
     parser.add_argument('--mostconstrained', default=False,
                         help="Use most constrained heuristic.")
     parser.add_argument('--forward', default=False,
                         help="Use forward checking.")
     parser.add_argument('--time', default=False)
-
+    parser.add_argument('--showplots', default=False, help="Show plots of localsearch function.")
 
     args = parser.parse_args(arguments)
 
@@ -582,7 +610,7 @@ print 'Solution: ' + str(solveLocal(start))
 '''
 
     print 'Time elapsed: ' + str(timeit.timeit(
-            solveSudokuLocal if args.localsearch else solveSudoku,
+            solveSudokuLocal if int(args.localsearch) else solveSudoku,
             setup = setup, number = 1))
 
 def doc(fn):
